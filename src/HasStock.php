@@ -5,6 +5,7 @@ namespace Appstract\Stock;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 trait HasStock
 {
