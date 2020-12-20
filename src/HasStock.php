@@ -10,27 +10,11 @@ trait HasStock
 {
     /*
      |--------------------------------------------------------------------------
-     | Accessors
-     |--------------------------------------------------------------------------
-     */
-
-    /**
-     * Stock accessor.
-     *
-     * @return int
-     */
-    public function getStockAttribute()
-    {
-        return $this->stock();
-    }
-
-    /*
-     |--------------------------------------------------------------------------
      | Methods
      |--------------------------------------------------------------------------
      */
 
-    public function stock($date = null)
+    public function getStock($date = null)
     {
         $date = $date ?: Carbon::now();
 
@@ -137,6 +121,21 @@ trait HasStock
                     ->havingRaw('SUM(amount) <= 0');
             })->orWhereDoesntHave('stockMutations');
         });
+    }
+    
+    public function scopeWithStock($query, $date = null)
+    {
+        $date ??= Carbon::now();
+
+        if (! $date instanceof DateTimeInterface) {
+            $date = Carbon::create($date);
+        }
+
+        return $query->addSelect([
+            'stock' => StockMutation::whereColumn('stockable_id', $this->getTable() .'.'. $this->getKeyName())
+                ->select(DB::raw('SUM(amount)'))
+                ->where('created_at', '<=', $date->format('Y-m-d H:i:s'))
+        ]);
     }
 
     /*
