@@ -26,6 +26,11 @@ trait HasStock
             ->where('created_at', '<=', $date->format('Y-m-d H:i:s'))
             ->sum('amount');
     }
+    
+    public function loadStock($date = null)
+    {
+        $this->attributes['stock'] = $this->getStock($date);
+    }
 
     public function increaseStock($amount = 1, $arguments = [])
     {
